@@ -7,13 +7,15 @@ import numpy as np
 ONSET_DURATION = 0.032
 
 
-class SustainPedal():
+class SustainPedal:
     """A sustain_pedal event.
     Parameters
     ----------
+    number : int
+        control number. {64, 127}
     value : int
-        The value of the control change, in ``[0, 127]``.
-    time : float
+        The value of the control change, in [0, 127].
+    start, end : float or None
         Time where the control change occurs.
     """
 
@@ -104,7 +106,7 @@ def mid2piano_roll(midi_path, pedal=False, onset=False, midi_min=21, midi_max=10
     else:
         mid = pretty_midi.PrettyMIDI(midi_path)
     if pedal:
-        mid = _elongate_offset_by_pedal(mid)
+        mid = elongate_offset_by_pedal(mid)
 
     max_step = int(np.ceil(mid.get_end_time() * fps))
     dim = midi_max - midi_min + 1
@@ -133,14 +135,18 @@ def mid2piano_roll(midi_path, pedal=False, onset=False, midi_min=21, midi_max=10
 
 
 def piano_roll2chroma_roll(piano_roll):
-    chroma_roll = np.zeros((piano_roll.shape[0], 12)) # (time, class)
+    chroma_roll = np.zeros((piano_roll.shape[0], 12))  # (time, class)
     for n in range(piano_roll.shape[1]):
         chroma_roll[:, n % 12] += piano_roll[:, n]
     chroma_roll = (chroma_roll >= 1).astype(np.int)
     return chroma_roll
 
 
-def mid2chroma_roll(midipath, pedal=False, onset=False):
-    piano_roll = mid2piano_roll(midipath, pedal=pedal, onset=onset)
+def mid2chroma_roll(midi_path, pedal=False, onset=False):
+    piano_roll = mid2piano_roll(midi_path, pedal=pedal, onset=onset)
     chroma_roll = piano_roll2chroma_roll(piano_roll)
     return chroma_roll
+
+
+def get_inactive_region(midi_obj):
+    pass

@@ -10,9 +10,12 @@ import os
 import json
 import datetime
 import tensorflow as tf
+import pickle
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import ntpath
+import fnmatch
 
 
 def array2stack(array, length, hop=None):
@@ -158,3 +161,40 @@ def pad2d(feature, seg_len):
 
 def normalize(feature, mean, std):
     return np.divide((feature - mean[None, :]), std[None, :], where=(std[None, :] != 0))
+
+
+def maybe_make_dir(dir_name):
+    if not os.path.isdir(dir_name):
+        os.makedirs(dir_name)
+
+
+def change_name_extension(file_name, new_ext):
+    if new_ext[0] is not '.':
+        new_ext = '.' + new_ext
+
+    return os.path.splitext(file_name)[0] + new_ext
+
+
+def split_path_from_path(file_path):
+    head, tail = ntpath.split(file_path)
+    return head, tail
+
+
+def save_obj(obj, name):
+    save_name = change_name_extension(name, '.pkl')
+    with open(save_name, 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+
+def load_obj(name):
+    save_name = change_name_extension(name, '.pkl')
+    with open(save_name, 'rb') as f:
+        return pickle.load(f)
+
+
+def find_files_in_subdirs(folder, regexp):
+    matches = []
+    for root, dirnames, filenames in os.walk(folder):
+        for filename in fnmatch.filter(filenames, regexp):
+            matches.append(os.path.join(root, filename))
+    return matches
