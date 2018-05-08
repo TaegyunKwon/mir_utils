@@ -1,4 +1,3 @@
-import os
 import pretty_midi
 import warnings
 import numpy as np

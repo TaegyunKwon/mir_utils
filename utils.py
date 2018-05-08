@@ -1,15 +1,10 @@
 from __future__ import division
 
-import re
-import pretty_midi
 import numpy as np
-import mido
 import math
 from numpy.lib.stride_tricks import as_strided
 import os
 import json
-import datetime
-import tensorflow as tf
 import pickle
 import matplotlib
 matplotlib.use('Agg')
